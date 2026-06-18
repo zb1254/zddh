@@ -20,7 +20,8 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const session = await auth();
-        if (!session?.user?.accessToken) {
+        const token = session?.user?.accessToken || process.env.GITHUB_PAT;
+        if (!token) {
             return new Response('Unauthorized', { status: 401 });
         }
 
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
         const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)); // Convert Base64 to binary
 
         // 获取上传结果，包含路径和 commit hash
-        const { path: imageUrl, commitHash } = await uploadImageToGitHub(binaryData, session.user.accessToken, folder, prefix);
+        const { path: imageUrl, commitHash } = await uploadImageToGitHub(binaryData, token, folder, prefix);
 
         // Handle metadata
         const metadata = await getFileContent('src/navsphere/content/resource-metadata.json') as ResourceMetadata;
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
             'src/navsphere/content/resource-metadata.json',
             JSON.stringify(metadata, null, 2),
             'Update resource metadata',
-            session.user.accessToken
+            token
         );
 
         return NextResponse.json({ success: true, imageUrl });
@@ -98,7 +99,8 @@ async function uploadImageToGitHub(binaryData: Uint8Array, token: string, folder
 export async function DELETE(request: Request) {
     try {
         const session = await auth();
-        if (!session?.user?.accessToken) {
+        const token = session?.user?.accessToken || process.env.GITHUB_PAT;
+        if (!token) {
             return new Response('Unauthorized', { status: 401 });
         }
 
@@ -121,7 +123,7 @@ export async function DELETE(request: Request) {
             'src/navsphere/content/resource-metadata.json',
             JSON.stringify(metadata, null, 2),
             `Delete ${deletedCount} resource(s)`,
-            session.user.accessToken
+            token
         );
 
         // 注意：这里只是从元数据中删除了引用，实际的图片文件仍然存在于GitHub仓库中
