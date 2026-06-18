@@ -116,6 +116,26 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
         }
     }
 
+    // 浏览器端从 Bilibili API 获取 aid/cid（服务端 API 被海外屏蔽时的兜底）
+    const fetchBilibiliApiInfo = async (bvid: string) => {
+        try {
+            const res = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`, {
+                headers: { 'User-Agent': 'Mozilla/5.0' }
+            })
+            if (!res.ok) return
+            const data = await res.json()
+            if (data.code === 0 && data.data) {
+                const d = data.data
+                const cid = d.pages?.[0]?.cid || d.cid
+                if (d.aid) form.setValue('videoConfig.aid', String(d.aid))
+                if (cid) form.setValue('videoConfig.cid', String(cid))
+                if (d.title) form.setValue('title', d.title)
+                if (d.desc) form.setValue('description', d.desc)
+                if (d.pic) form.setValue('icon', d.pic)
+            }
+        } catch { /* silent */ }
+    }
+
     const fetchWebsiteMetadata = async (url: string, force: boolean = false) => {
         if (isFetchingMetadata) return
 
@@ -177,6 +197,8 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
                     form.setValue('videoConfig.type', extracted.type)
                     if (extracted.type === 'bilibili') {
                         form.setValue('videoConfig.bvid', extracted.id)
+                        // 浏览器端从 Bilibili API 获取 aid/cid
+                        fetchBilibiliApiInfo(extracted.id)
                     } else if (extracted.type === 'youtube') {
                         form.setValue('videoConfig.videoId', extracted.id)
                     }
@@ -197,6 +219,7 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
                     form.setValue('videoConfig.type', extracted.type)
                     if (extracted.type === 'bilibili') {
                         form.setValue('videoConfig.bvid', extracted.id)
+                        fetchBilibiliApiInfo(extracted.id)
                     } else if (extracted.type === 'youtube') {
                         form.setValue('videoConfig.videoId', extracted.id)
                     }

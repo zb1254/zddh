@@ -46,7 +46,11 @@ export function VideoCard({ item }: VideoCardProps) {
 
         if (videoConfig.type === 'bilibili') {
             const { bvid, aid, cid, p = 1 } = videoConfig
-            const src = `//player.bilibili.com/player.html?isOutside=true&aid=${aid}&bvid=${bvid}&cid=${cid}&p=${p}&autoplay=1`
+            const params = new URLSearchParams({ bvid, autoplay: '1' })
+            if (aid) params.set('aid', aid)
+            if (cid) params.set('cid', cid)
+            if (p) params.set('p', String(p))
+            const src = `//player.bilibili.com/player.html?${params.toString()}`
 
             return (
                 <div className="w-full aspect-video">
