@@ -89,18 +89,6 @@
                 "type": "youtube",
                 "videoId": "HE8UEqqeXfo"
               }
-            },
-            {
-              "id": "1781773647415",
-              "title": "Vodcnd11",
-              "href": "https://vodcnd11.myqqdd.com/20260618/bmMIq9Rq/index.m3u8",
-              "description": "访问 vodcnd11.myqqdd.com",
-              "icon": "https://www.google.com/s2/favicons?sz=128&domain=vodcnd11.myqqdd.com",
-              "enabled": true,
-              "videoConfig": {
-                "type": "url",
-                "url": "https://vodcnd11.myqqdd.com/20260618/bmMIq9Rq/index.m3u8"
-              }
             }
           ]
         }
