@@ -14,7 +14,7 @@ export function generateMetadata(): Metadata {
     const { siteData } = getData()
 
     return {
-        title: `Videos - ${siteData.basic.title}`,
+        title: `Videos`,
         description: 'Video Navigation',
         keywords: 'Bilibili, YouTube, Videos',
         icons: {

@@ -12,7 +12,7 @@ export function generateMetadata(): Metadata {
     const { siteData } = getData()
 
     return {
-        title: `视频播放器 - ${siteData.basic.title}`,
+        title: `视频播放器`,
         description: '视频播放中心',
         keywords: 'Bilibili, YouTube, Videos, Player',
         icons: {
