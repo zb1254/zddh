@@ -17,7 +17,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: {
     default: 'NavSphere',
-    template: '%s - NavSphere'
+    template: '%s'
   },
   description: 'A modern navigation platform',
   icons: {
