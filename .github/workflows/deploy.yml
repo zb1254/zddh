@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare Workers
 
 on:
   push:
@@ -25,20 +25,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build with OpenNext
-        run: pnpm cf:build
-
-      - name: Deploy to Cloudflare Pages
-        run: |
-          mkdir -p deploy-output
-          cp -r .open-next/. deploy-output/
-          mv deploy-output/worker.js deploy-output/_worker.js
-          cp -r public/. deploy-output/
-          if [ -d ".next/static" ]; then
-            mkdir -p deploy-output/_next
-            cp -r .next/static deploy-output/_next/static
-          fi
-          npx wrangler pages deploy deploy-output --project-name navsphere
+      - name: Build and Deploy
+        run: pnpm cf:build && npx opennextjs-cloudflare deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
