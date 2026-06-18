@@ -18,11 +18,18 @@
       "items": [
         {
           "id": "1781763169946",
-          "title": "Bilibili",
-          "href": "https://www.bilibili.com/video/BV1es411q7Xb/?spm_id_from=333.337.search-card.all.click",
-          "description": "访问 www.bilibili.com",
-          "icon": "https://www.google.com/s2/favicons?sz=128&domain=www.bilibili.com",
-          "enabled": true
+          "title": "【10堂速成课】读懂行为经济学 27讲 - 行为经济学",
+          "href": "https://www.bilibili.com/video/BV1es411q7Xb",
+          "description": "Bilibili - 行为经济学入门课程",
+          "icon": "",
+          "enabled": true,
+          "videoConfig": {
+            "type": "bilibili",
+            "bvid": "BV1es411q7Xb",
+            "aid": "4485557",
+            "cid": "7269930",
+            "p": 1
+          }
         }
       ],
       "subCategories": [
@@ -36,12 +43,16 @@
             {
               "id": "1781763429881",
               "title": "行为经济学 1.1 行为经济学简介",
-              "href": "http://bilibili.com/video/BV1Ha4y1i7zJ?spm_id_from=333.788.videopod.episodes",
-              "description": "访问 bilibili.com",
-              "icon": "https://www.google.com/s2/favicons?sz=128&domain=bilibili.com",
+              "href": "https://www.bilibili.com/video/BV1Ha4y1i7zJ",
+              "description": "Bilibili - 行为经济学入门课程",
+              "icon": "",
               "enabled": true,
               "videoConfig": {
-                "type": "bilibili"
+                "type": "bilibili",
+                "bvid": "BV1Ha4y1i7zJ",
+                "aid": "668099760",
+                "cid": "188949199",
+                "p": 1
               }
             }
           ]
