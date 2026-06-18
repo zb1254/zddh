@@ -47,7 +47,8 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
           },
           navigation: {
             linkTarget: '_blank'
-          }
+          },
+          headerLinks: []
         })
       } finally {
         setIsLoading(false)

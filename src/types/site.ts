@@ -1,3 +1,9 @@
+export interface HeaderLink {
+  icon: string
+  href: string
+  ariaLabel: string
+}
+
 export interface SiteConfig {
   basic: {
     title: string
@@ -12,6 +18,7 @@ export interface SiteConfig {
   navigation: {
     linkTarget: '_blank' | '_self'
   }
+  headerLinks?: HeaderLink[]
 }
 
 export interface SiteInfo {
@@ -28,4 +35,5 @@ export interface SiteInfo {
   navigation: {
     linkTarget: string
   }
+  headerLinks?: HeaderLink[]
 } 

@@ -22,7 +22,8 @@ export class SiteConfigService {
         },
         navigation: {
           linkTarget: '_blank'
-        }
+        },
+        headerLinks: []
       }
     }
   }
