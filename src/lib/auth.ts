@@ -1,5 +1,5 @@
 import NextAuth from 'next-auth'
-import GithubProvider from 'next-auth/providers/github'
+import CredentialsProvider from 'next-auth/providers/credentials'
 import type { DefaultSession, NextAuthConfig } from 'next-auth'
 
 declare module 'next-auth' {
@@ -18,18 +18,33 @@ declare module 'next-auth' {
 
 const config = {
   providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-      authorization: {
-        params: { scope: 'repo' }
+    CredentialsProvider({
+      name: 'credentials',
+      credentials: {
+        username: { label: '用户名', type: 'text' },
+        password: { label: '密码', type: 'password' }
+      },
+      async authorize(credentials) {
+        const adminUsers = process.env.ADMIN_USERS?.split(',').map(s => s.trim()).filter(Boolean) || []
+        if (adminUsers.length === 0) return null
+        for (const entry of adminUsers) {
+          const [username, password] = entry.split(':')
+          if (username === credentials?.username && password === credentials?.password) {
+            return {
+              id: username,
+              name: username,
+              accessToken: process.env.GITHUB_PAT || ''
+            }
+          }
+        }
+        return null
       }
     })
   ],
   callbacks: {
-    async jwt({ token, account }) {
-      if (account?.access_token) {
-        token.accessToken = account.access_token
+    async jwt({ token, user }) {
+      if (user?.accessToken) {
+        token.accessToken = user.accessToken
       }
       return token
     },
