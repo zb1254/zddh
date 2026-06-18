@@ -7,6 +7,7 @@ import { Providers } from '@/components/providers'
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import { Inter } from 'next/font/google'
+import siteDataRaw from '@/navsphere/content/site.json'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -14,12 +15,14 @@ const inter = Inter({
   variable: '--font-inter',
 })
 
+const siteTitle = (siteDataRaw as any).basic?.title || 'NavSphere'
+
 export const metadata: Metadata = {
   title: {
-    default: 'NavSphere',
-    template: '%s'
+    default: siteTitle,
+    template: `%s - ${siteTitle}`
   },
-  description: 'A modern navigation platform',
+  description: (siteDataRaw as any).basic?.description || 'A modern navigation platform',
   icons: {
     icon: '/favicon.ico'
   }
