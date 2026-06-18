@@ -77,6 +77,18 @@
                 "bvid": "BV1qmSaB5EdG",
                 "p": 1
               }
+            },
+            {
+              "id": "1781772014051",
+              "title": "YouTube Video",
+              "href": "https://www.youtube.com/watch?v=HE8UEqqeXfo",
+              "description": "",
+              "icon": "https://www.google.com/s2/favicons?sz=128&domain=youtube.com",
+              "enabled": true,
+              "videoConfig": {
+                "type": "youtube",
+                "videoId": "HE8UEqqeXfo"
+              }
             }
           ]
         }
