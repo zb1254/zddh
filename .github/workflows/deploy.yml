@@ -33,6 +33,11 @@ jobs:
           mkdir -p deploy-output
           cp -r .open-next/. deploy-output/
           mv deploy-output/worker.js deploy-output/_worker.js
+          cp -r public/. deploy-output/
+          if [ -d ".next/static" ]; then
+            mkdir -p deploy-output/_next
+            cp -r .next/static deploy-output/_next/static
+          fi
           npx wrangler pages deploy deploy-output --project-name navsphere
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
