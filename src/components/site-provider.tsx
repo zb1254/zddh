@@ -48,7 +48,15 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
           navigation: {
             linkTarget: '_blank'
           },
-          headerLinks: []
+          headerLinks: [],
+          popup: {
+            enabled: false,
+            title: '',
+            content: '',
+            imageUrl: '',
+            linkUrl: '',
+            linkText: ''
+          }
         })
       } finally {
         setIsLoading(false)

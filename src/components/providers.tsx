@@ -1,6 +1,8 @@
 'use client'
 
 import { SWRConfig } from 'swr'
+import { SiteProvider } from './site-provider'
+import { SitePopup } from './site-popup'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -11,7 +13,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         revalidateOnReconnect: false
       }}
     >
-      {children}
+      <SiteProvider>
+        {children}
+        <SitePopup />
+      </SiteProvider>
     </SWRConfig>
   )
 }

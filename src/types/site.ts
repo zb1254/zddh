@@ -4,6 +4,15 @@ export interface HeaderLink {
   ariaLabel: string
 }
 
+export interface PopupConfig {
+  enabled: boolean
+  title: string
+  content: string
+  imageUrl: string
+  linkUrl: string
+  linkText: string
+}
+
 export interface SiteConfig {
   basic: {
     title: string
@@ -19,6 +28,7 @@ export interface SiteConfig {
     linkTarget: '_blank' | '_self'
   }
   headerLinks?: HeaderLink[]
+  popup?: PopupConfig
 }
 
 export interface SiteInfo {
@@ -36,4 +46,5 @@ export interface SiteInfo {
     linkTarget: string
   }
   headerLinks?: HeaderLink[]
+  popup?: PopupConfig
 } 

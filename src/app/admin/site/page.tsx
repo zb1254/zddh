@@ -45,11 +45,21 @@ import {
 import { SiteConfigService} from "@/services/siteConfigService"
 import type { SiteConfig } from "@/types/site"
 import { Toaster } from "@/registry/new-york/ui/toaster"
+import { Switch } from "@/registry/new-york/ui/switch"
 
 const headerLinkSchema = z.object({
   icon: z.string().min(1, { message: "请输入图标名称" }),
   href: z.string().min(1, { message: "请输入链接地址" }),
   ariaLabel: z.string().min(1, { message: "请输入链接描述" }),
+})
+
+const popupSchema = z.object({
+  enabled: z.boolean(),
+  title: z.string(),
+  content: z.string(),
+  imageUrl: z.string(),
+  linkUrl: z.string(),
+  linkText: z.string(),
 })
 
 const formSchema = z.object({
@@ -75,6 +85,7 @@ const formSchema = z.object({
     linkTarget: z.enum(['_blank', '_self']),
   }),
   headerLinks: z.array(headerLinkSchema),
+  popup: popupSchema,
 })
 
 export default function SiteSettings() {
@@ -96,6 +107,14 @@ export default function SiteSettings() {
         linkTarget: "_blank",
       },
       headerLinks: [],
+      popup: {
+        enabled: false,
+        title: '',
+        content: '',
+        imageUrl: '',
+        linkUrl: '',
+        linkText: '',
+      },
     },
   })
 
@@ -104,7 +123,11 @@ export default function SiteSettings() {
       const siteConfigService = new SiteConfigService();
       const config = await siteConfigService.getSiteConfig();
       if (config) {
-        form.reset({ ...config, headerLinks: config.headerLinks || [] });
+        form.reset({
+          ...config,
+          headerLinks: config.headerLinks || [],
+          popup: config.popup || { enabled: false, title: '', content: '', imageUrl: '', linkUrl: '', linkText: '' },
+        });
       }
     }
     loadConfig()
@@ -136,6 +159,7 @@ export default function SiteSettings() {
             <TabsTrigger value="appearance">外观设置</TabsTrigger>
             <TabsTrigger value="navigation">导航设置</TabsTrigger>
             <TabsTrigger value="headerLinks">页头链接</TabsTrigger>
+            <TabsTrigger value="popup">弹窗设置</TabsTrigger>
           </TabsList>
           <TabsContent value="basic">
             <Card>
@@ -350,6 +374,118 @@ export default function SiteSettings() {
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                     <HeaderLinksField control={form.control} />
+                    <div className="flex justify-start">
+                      <Button 
+                        type="submit"
+                        className="w-[120px]"
+                        disabled={form.formState.isSubmitting}
+                      >
+                        {form.formState.isSubmitting ? (
+                          <>
+                            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                            保存中
+                          </>
+                        ) : (
+                          <>
+                            <Icons.save className="mr-2 h-4 w-4" />
+                            保存更改
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="popup">
+            <Card>
+              <CardHeader>
+                <CardTitle>弹窗设置</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                    <FormField
+                      control={form.control}
+                      name="popup.enabled"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel>启用弹窗</FormLabel>
+                            <FormDescription>开启后在网站首页显示美化弹窗</FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="popup.title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>弹窗标题</FormLabel>
+                          <FormControl>
+                            <Input placeholder="欢迎访问我们的网站" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="popup.content"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>弹窗内容</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="输入弹窗展示的文字内容" className="resize-none" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="popup.imageUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>图片地址</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://example.com/image.png" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="popup.linkUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>链接地址</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://example.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="popup.linkText"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>链接文字</FormLabel>
+                          <FormControl>
+                            <Input placeholder="了解更多" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                     <div className="flex justify-start">
                       <Button 
                         type="submit"

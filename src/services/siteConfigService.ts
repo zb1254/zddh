@@ -23,7 +23,15 @@ export class SiteConfigService {
         navigation: {
           linkTarget: '_blank'
         },
-        headerLinks: []
+        headerLinks: [],
+        popup: {
+          enabled: false,
+          title: '',
+          content: '',
+          imageUrl: '',
+          linkUrl: '',
+          linkText: ''
+        }
       }
     }
   }
