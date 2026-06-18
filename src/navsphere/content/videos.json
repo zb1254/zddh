@@ -28,7 +28,16 @@
           }
         }
       ],
-      "subCategories": []
+      "subCategories": [
+        {
+          "id": "d9c1965a-df06-4242-a7c3-d17c78818585",
+          "title": "行为经济学",
+          "icon": "PlayCircle",
+          "description": "",
+          "enabled": true,
+          "items": []
+        }
+      ]
     },
     {
       "id": "1769594423824",
