@@ -128,6 +128,21 @@ function extractBilibiliVideoId(url: string): { bvid?: string; aid?: string; p?:
     }
 }
 
+// 通过第三方代理 bilibilia.com 获取封面（API 和 HTML 都失败时的兜底）
+async function fetchBilibiliCoverViaProxy(bvid: string): Promise<string | null> {
+    try {
+        const response = await fetch(`https://bilibilia.com/api/bcover/?vid=${bvid}`, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+            signal: AbortSignal.timeout(5000)
+        })
+        if (!response.ok) return null
+        const data = await response.json()
+        return data?.coverImageUrl || null
+    } catch {
+        return null
+    }
+}
+
 // 从 Bilibili 视频页面 HTML 中提取 meta 标签（API 被屏蔽时的备选）
 async function scrapeBilibiliPageMeta(bvid: string, p?: number): Promise<WebsiteMetadata | null> {
     try {
@@ -274,12 +289,17 @@ async function fetchWebsiteMetadata(url: string): Promise<WebsiteMetadata> {
                     return scraped
                 }
             }
+            // 2.5) 尝试第三方代理获取封面
+            let coverFromProxy: string | undefined
+            if (bilibiliVideoId.bvid) {
+                coverFromProxy = await fetchBilibiliCoverViaProxy(bilibiliVideoId.bvid) || undefined
+            }
             // 3) 都失败，返回基本信息 + videoConfig 保证嵌入可用
             const hostname = new URL(url).hostname
             return {
                 title: hostname.replace(/^www\./, '').split('.')[0],
                 description: `访问 ${hostname}`,
-                icon: '/assets/icons/bilibili.svg',
+                icon: coverFromProxy || '/assets/icons/bilibili.svg',
                 videoConfig: {
                     type: 'bilibili',
                     bvid: bilibiliVideoId.bvid || bilibiliVideoId.aid,
