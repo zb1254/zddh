@@ -89,7 +89,8 @@ export function VideoPlayerPage({ navigationData }: VideoPlayerPageProps) {
 
         if (videoConfig.type === 'bilibili') {
             const { bvid, aid, cid, p = 1 } = videoConfig
-            const params = new URLSearchParams({ bvid, autoplay: '1' })
+            const params = new URLSearchParams({ autoplay: '1' })
+            if (bvid) params.set('bvid', bvid)
             if (aid) params.set('aid', aid)
             if (cid) params.set('cid', cid)
             if (p) params.set('p', String(p))
