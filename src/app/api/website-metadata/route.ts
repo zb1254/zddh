@@ -128,6 +128,66 @@ function extractBilibiliVideoId(url: string): { bvid?: string; aid?: string; p?:
     }
 }
 
+// 从 Bilibili 视频页面 HTML 中提取 meta 标签（API 被屏蔽时的备选）
+async function scrapeBilibiliPageMeta(bvid: string, p?: number): Promise<WebsiteMetadata | null> {
+    try {
+        const url = `https://www.bilibili.com/video/${bvid}${p && p > 1 ? `?p=${p}` : ''}`
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
+            },
+            signal: AbortSignal.timeout(8000)
+        })
+        if (!response.ok) return null
+        const html = await response.text()
+
+        // 从 <title> 提取标题
+        const titleMatch = html.match(/<title>([^<]+)<\/title>/)
+        const title = titleMatch ? titleMatch[1].replace(/_哔哩哔哩_bilibili$/, '').trim() : ''
+
+        // 从 <meta name="description"> 提取描述
+        const descMatch = html.match(/<meta[^>]*name="description"[^>]*content="([^"]*)"[^>]*>/)
+        const description = descMatch ? descMatch[1] : ''
+
+        // 从 <meta property="og:image"> 提取封面
+        const imageMatch = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]*)"[^>]*>/)
+        const image = imageMatch ? imageMatch[1].replace(/^\/\//, 'https://') : undefined
+
+        // 从 window.__INITIAL_STATE__ 提取 aid 和 cid
+        const initMatch = html.match(/window\.__INITIAL_STATE__\s*=\s*({.*?});\s*</)
+        let aid: string | undefined
+        let cid: string | undefined
+        if (initMatch) {
+            try {
+                const initState = JSON.parse(initMatch[1])
+                aid = initState.videoData?.aid?.toString()
+                if (p && p > 0 && initState.videoData?.pages) {
+                    const targetPage = initState.videoData.pages[p - 1]
+                    cid = targetPage?.cid?.toString()
+                } else {
+                    cid = initState.videoData?.cid?.toString()
+                }
+            } catch { /* JSON parse failed, ignore */ }
+        }
+
+        return {
+            title: title || bvid,
+            description: description || '',
+            icon: '/assets/icons/bilibili.svg',
+            image: image,
+            videoConfig: {
+                type: 'bilibili',
+                bvid: bvid,
+                aid: aid,
+                cid: cid,
+                p: p || 1
+            }
+        }
+    } catch {
+        return null
+    }
+}
+
 // 通过 Bilibili API 获取视频信息
 async function fetchBilibiliVideoInfo(videoId: { bvid?: string; aid?: string; p?: number }): Promise<WebsiteMetadata | null> {
     try {
@@ -202,17 +262,29 @@ async function fetchWebsiteMetadata(url: string): Promise<WebsiteMetadata> {
         // 优先处理 Bilibili 视频链接
         const bilibiliVideoId = extractBilibiliVideoId(url)
         if (bilibiliVideoId) {
+            // 1) 尝试 API
             const bilibiliInfo = await fetchBilibiliVideoInfo(bilibiliVideoId)
             if (bilibiliInfo) {
                 return bilibiliInfo
             }
-            // Bilibili API 失败（海外 Worker 被屏蔽），不返回 videoConfig，
-            // 让客户端兜底从浏览器直接请求 api.bilibili.com
+            // 2) API 失败，尝试抓取页面 HTML
+            if (bilibiliVideoId.bvid) {
+                const scraped = await scrapeBilibiliPageMeta(bilibiliVideoId.bvid, bilibiliVideoId.p)
+                if (scraped) {
+                    return scraped
+                }
+            }
+            // 3) 都失败，返回基本信息 + videoConfig 保证嵌入可用
             const hostname = new URL(url).hostname
             return {
                 title: hostname.replace(/^www\./, '').split('.')[0],
                 description: `访问 ${hostname}`,
-                icon: `https://www.google.com/s2/favicons?sz=128&domain=${hostname}`
+                icon: '/assets/icons/bilibili.svg',
+                videoConfig: {
+                    type: 'bilibili',
+                    bvid: bilibiliVideoId.bvid || bilibiliVideoId.aid,
+                    p: bilibiliVideoId.p || 1
+                }
             }
         }
 
