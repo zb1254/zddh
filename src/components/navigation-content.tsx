@@ -8,7 +8,7 @@ import { Sidebar } from '@/components/sidebar'
 import { SearchBar } from '@/components/search-bar'
 import { ModeToggle } from '@/components/mode-toggle'
 import { Footer } from '@/components/footer'
-import { Github, HelpCircle, Puzzle, MonitorPlay, Send, Globe, ExternalLink, Link2, Mail, MessageCircle, BookOpen, Download, Share2, Heart, Star, Bell, Sun, Moon, Zap, Music, Film, Camera, Video, Settings, User, Search, Home, Info, ArrowRight, ChevronRight } from 'lucide-react'
+import { Github, HelpCircle, Puzzle, MonitorPlay, Send, Globe, ExternalLink, Link2, Mail, MessageCircle, BookOpen, Download, Share2, Heart, Star, Bell, Sun, Moon, Zap, Music, Film, Camera, Video, Settings, User, Search, Home, Info,   ArrowRight, ChevronRight, JapaneseYen } from 'lucide-react'
 import { Button } from "@/registry/new-york/ui/button"
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
@@ -20,7 +20,7 @@ const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   Heart, Star, Bell, Sun, Moon, Zap,
   Music, Film, Camera, Video,
   Settings, User, Search, Home, Info,
-  ArrowRight, ChevronRight
+  ArrowRight, ChevronRight, JapaneseYen
 }
 
 interface NavigationContentProps {

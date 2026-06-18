@@ -17,7 +17,7 @@ import {
   Heart, Star, Bell, Sun, Moon, Zap,
   Music, Film, Camera, Video,
   Settings, User, Search, Home, Info,
-  ArrowRight, ChevronRight, Check, ChevronsUpDown
+  ArrowRight, ChevronRight, Check, ChevronsUpDown, JapaneseYen
 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/registry/new-york/ui/select"
 import {
@@ -387,7 +387,7 @@ const ICON_OPTIONS = [
   "Heart", "Star", "Bell", "Sun", "Moon", "Zap",
   "Music", "Film", "Camera", "Video",
   "Settings", "User", "Search", "Home", "Info",
-  "ArrowRight", "ChevronRight"
+  "ArrowRight", "ChevronRight", "JapaneseYen"
 ]
 
 const iconMap: Record<string, ComponentType<{ className?: string }>> = {
@@ -396,7 +396,7 @@ const iconMap: Record<string, ComponentType<{ className?: string }>> = {
   Heart, Star, Bell, Sun, Moon, Zap,
   Music, Film, Camera, Video,
   Settings, User, Search, Home, Info,
-  ArrowRight, ChevronRight
+  ArrowRight, ChevronRight, JapaneseYen
 }
 
 function IconPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -436,7 +436,6 @@ function IconPicker({ value, onChange }: { value: string; onChange: (v: string) 
             <CommandEmpty>
               {search && (
                 <CommandItem
-                  value={search}
                   onSelect={() => {
                     onChange(search)
                     setOpen(false)
