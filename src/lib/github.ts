@@ -93,13 +93,20 @@ export async function commitFile(
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        if (attempt < retryCount && error.message?.includes('sha')) {
+        const errorText = await response.text();
+        let errorMsg: string;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMsg = errorJson.message || errorText;
+        } catch {
+          errorMsg = errorText || `HTTP ${response.status}`;
+        }
+        if (attempt < retryCount && errorMsg?.includes('sha')) {
           console.log(`Attempt ${attempt} failed, retrying after delay...`)
-          await delay(1000 * attempt) // 指数退避
+          await delay(1000 * attempt)
           continue
         }
-        throw new Error(`Failed to commit file: ${error.message}`)
+        throw new Error(`Failed to commit file: ${errorMsg}`)
       }
 
       return await response.json()

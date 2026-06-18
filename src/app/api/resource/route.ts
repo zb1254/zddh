@@ -81,9 +81,16 @@ async function uploadImageToGitHub(binaryData: Uint8Array, token: string, folder
         }),
     });
     if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Failed to upload image to GitHub:', errorData);
-        throw new Error(`Failed to upload image to GitHub: ${errorData.message || 'Unknown error'}`);
+        const errorText = await response.text();
+        let errorMsg: string;
+        try {
+            const errorJson = JSON.parse(errorText);
+            errorMsg = errorJson.message || errorText;
+        } catch {
+            errorMsg = errorText || `HTTP ${response.status}`;
+        }
+        console.error('Failed to upload image to GitHub:', errorMsg);
+        throw new Error(errorMsg);
     }
 
     const responseData = await response.json();
