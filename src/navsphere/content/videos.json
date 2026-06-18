@@ -18,13 +18,16 @@
       "items": [
         {
           "id": "1781763169946",
-          "title": "行为经济学 1.1 行为经济学简介",
-          "href": "https://www.bilibili.com/video/BV1Ha4y1i7zJ?spm_id_from=333.788.videopod.episodes",
+          "title": "Bilibili",
+          "href": "https://www.bilibili.com/video/BV1es411q7Xb/?spm_id_from=333.337.search-card.all.click",
           "description": "访问 www.bilibili.com",
           "icon": "https://www.google.com/s2/favicons?sz=128&domain=www.bilibili.com",
           "enabled": true,
           "videoConfig": {
-            "type": "bilibili"
+            "type": "bilibili",
+            "bvid": "BV1es411q7Xb",
+            "aid": "24039868",
+            "cid": "39688568"
           }
         }
       ],
