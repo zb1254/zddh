@@ -1,18 +1,11 @@
-# NavSphere - Video Navigation Platform
+# NavSphere - Content Navigation Platform
 
 <p align="center">
-  <strong>Modern Content Navigation Platform | Video Navigation + Website Navigation</strong>
+  <strong>Video Navigation + Website Navigation</strong>
 </p>
 
 <p align="center">
   <a href="./README.md">简体中文</a> | <strong>English</strong>
-</p>
-
-<p align="center">
-  <a href="https://github.com/tianyaxiang/NavSphere/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/tianyaxiang/NavSphere?style=flat-square"></a>
-  <a href="https://github.com/tianyaxiang/NavSphere/network"><img alt="GitHub forks" src="https://img.shields.io/github/forks/tianyaxiang/NavSphere?style=flat-square"></a>
-  <a href="https://github.com/tianyaxiang/NavSphere/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/tianyaxiang/NavSphere?style=flat-square"></a>
-  <a href="https://github.com/tianyaxiang/NavSphere/blob/main/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/tianyaxiang/NavSphere?style=flat-square"></a>
 </p>
 
 ## 📖 Introduction
@@ -33,11 +26,11 @@ Comprehensive website bookmark management system to help you collect and organiz
 - 🔖 **Website Navigation Management**: Collect and manage your favorite websites and online tools
 - 📊 **Category Management**: Flexible category and subcategory system with unlimited hierarchy
 - 🎨 **Modern Interface**: Beautiful UI based on Radix UI and Tailwind CSS
-- 🔐 **GitHub Authentication**: Secure login based on NextAuth.js
+- 🔐 **Username & Password Login**: Secure login with configured admin credentials
 - 📱 **Responsive Design**: Perfect adaptation for desktop and mobile
 - 🌓 **Theme Switching**: Support for dark/light themes
 - 🎯 **Smart Icons**: Automatically fetch website Favicons
-- ⚡ **High Performance**: Support for Cloudflare Pages edge deployment
+- ⚡ **High Performance**: Deployed on Cloudflare Workers edge network
 
 ## ✨ Core Features
 
@@ -84,7 +77,7 @@ Comprehensive website bookmark management system to help you collect and organiz
 - 📦 **State Management**: React Query for data fetching and caching
 - 🔧 **Form Handling**: React Hook Form + Zod validation
 - 🌐 **Data Storage**: GitHub repository as data backend
-- 🔐 **Authentication**: NextAuth.js v5 OAuth authentication
+- 🔐 **Authentication**: Credentials-based (username/password) login
 
 ## 🛠️ Tech Stack
 
@@ -146,62 +139,39 @@ pnpm dev
 Create a `.env.local` file and configure the following variables:
 
 ```env
-# GitHub OAuth App Configuration
-GITHUB_CLIENT_ID=your-github-client-id
-GITHUB_CLIENT_SECRET=your-github-client-secret
+# Admin Credentials (format: username:password, comma separated for multiple)
+ADMIN_USERS=admin:your-password
 
 # GitHub Repository Configuration
 GITHUB_OWNER=your-github-username
-GITHUB_REPO=your-repo-name
+GITHUB_REPO=your-data-repo-name
 GITHUB_BRANCH=main
 
-# GitHub Fine-grained PAT (for anonymous submission to create Issues)
+# GitHub Fine-grained PAT (for reading/writing repo data)
 GITHUB_PAT=your-github-personal-access-token
 
 # NextAuth Configuration
 NEXTAUTH_URL=http://localhost:3000
 AUTH_SECRET=your-random-auth-secret
-NEXT_PUBLIC_API_URL=http://localhost:3000
-
-# Google Analytics Configuration (Optional)
-GA_ID=your-google-analytics-id
+AUTH_TRUST_HOST=true
 ```
 
-### GitHub OAuth App Setup
+### GitHub Token Setup
 
-1. **Create OAuth App**
-   - Visit [GitHub Developer Settings](https://github.com/settings/developers)
-   - Click "New OAuth App"
-   - Fill in application information:
-     ```
-     Application name: NavSphere
-     Homepage URL: http://localhost:3000
-     Authorization callback URL: http://localhost:3000/api/auth/callback/github
-     ```
-
-2. **Get Credentials**
-   - Client ID: Displayed on the application details page
-   - Client Secret: Click "Generate a new client secret" to generate
+1. Visit [GitHub Settings → Tokens](https://github.com/settings/tokens)
+2. Click **Generate new token** → **Fine-grained token**
+3. Set repository access to **Only select repositories** and choose your data repo
+4. Set permissions: **Contents: Read and Write**
+5. Generate and copy the token
 
 ### GitHub Data Repository Setup
 
-1. **Create Data Repository**
-   - Visit [GitHub New Repository](https://github.com/new)
-   - Suggested repository name: `navsphere-data`
-   - Choose Public or Private
-
-2. **Initialize Data Files**
-   
-   The project will automatically create the following data files:
-   - `videos.json` - Video data
-   - `navigation.json` - Navigation data
-   - `site.json` - Site configuration
+1. Create a repository on GitHub (e.g., `navsphere-data`)
+2. The app will automatically create data files (`videos.json`, `navigation.json`, `site.json`) on first write
 
 ## 📊 Data Structure
 
 ### videos.json - Video Data Format
-
-Video navigation data storage format:
 
 ```json
 {
@@ -229,23 +199,13 @@ Video navigation data storage format:
           }
         }
       ],
-      "subCategories": [
-        {
-          "id": "sub-category-id",
-          "title": "Subcategory Name",
-          "icon": "PlayCircle",
-          "enabled": true,
-          "items": []
-        }
-      ]
+      "subCategories": [...]
     }
   ]
 }
 ```
 
-### navigation.json - Website Navigation Data Format
-
-Website navigation data storage format:
+### navigation.json - Website Navigation Data
 
 ```json
 {
@@ -266,119 +226,63 @@ Website navigation data storage format:
           "enabled": true
         }
       ],
-      "subCategories": [
-        {
-          "id": "sub-category-id",
-          "title": "Subcategory Name",
-          "icon": "BookOpen",
-          "description": "Subcategory Description",
-          "enabled": true,
-          "items": [
-            {
-              "id": "sub-item-id",
-              "title": "Website Name",
-              "href": "https://example.com",
-              "description": "Website Description",
-              "icon": "/assets/favicon.webp",
-              "enabled": true
-            }
-          ]
-        }
-      ]
+      "subCategories": [...]
     }
   ]
 }
 ```
 
-## 🚀 Deployment Guide
+## 🚀 Deployment (Cloudflare Workers)
 
-### Cloudflare Pages Deployment (Recommended)
+### 1. Prerequisites
 
-1. **Create Project**
-   - Log in to [Cloudflare Pages](https://pages.cloudflare.com/)
-   - Connect your GitHub repository
+- Fork this repo to your GitHub account
+- [Cloudflare](https://dash.cloudflare.com/) account
+- A GitHub **Fine-grained PAT** with `Contents: Read/Write` on your data repo
 
-2. **Build Settings**
-   ```bash
-   # Build command
-   pnpm install && pnpm run cf:build
-   
-   # Output directory
-   .next
-   
-   # Node.js version
-   20.0.0
-   ```
+### 2. Create Cloudflare API Token
 
-3. **Environment Variables Configuration**
-   
-   Add all required environment variables in Cloudflare Pages
+- Cloudflare Dashboard → **My Profile** → **API Tokens** → **Create Token**
+- Use **Edit Cloudflare Workers** template
+- Select your account
+- Save the token
 
-4. **Custom Deployment**
-   ```bash
-   # Local build and deploy
-   pnpm run cf:deploy
-   ```
+### 3. Set GitHub Secrets
 
-### Vercel Deployment
+Go to your forked repo → **Settings → Secrets and variables → Actions → New repository secret**:
 
-1. **One-Click Deployment**
-   - Click the "Deploy with Vercel" button
-   - Configure required environment variables
+| Secret | Value |
+|--------|-------|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API Token |
+| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare Account ID |
+| `GITHUB_PAT` | Your GitHub Fine-grained PAT |
+| `GITHUB_OWNER` | Your GitHub username |
+| `GITHUB_REPO` | Your data repository name |
+| `GITHUB_BRANCH` | `main` |
+| `ADMIN_USERS` | `user1:pass1,user2:pass2` |
+| `AUTH_SECRET` | Random string (`openssl rand -base64 32`) |
 
-2. **Manual Deployment**
-   - Fork the project to your GitHub
-   - Import the project in Vercel
-   - Configure environment variables
-   - Deploy the project
+### 4. Deploy
 
-### Docker Deployment
+Push to `main` branch — GitHub Actions will automatically build and deploy to:
+`https://navsphere.<your-subdomain>.workers.dev`
 
-```bash
-# Build image
-pnpm run docker:build
+### 5. Custom Domain (Optional)
 
-# Development environment
-pnpm run docker:dev
-
-# Production environment
-pnpm run docker:prod
-
-# View logs
-pnpm run docker:logs
-
-# Stop service
-pnpm run docker:stop
-```
+- Workers → navsphere → Triggers → Custom Domain
+- Update `NEXTAUTH_URL` env var in Workers dashboard
+- Add your domain to `next.config.js` `allowedOrigins` if needed
 
 ## 🔧 Development Guide
 
 ### Available Scripts
 
 ```bash
-# Development mode
-pnpm dev
-
-# Build project
-pnpm build
-
-# Start production server
-pnpm start
-
-# Code linting
-pnpm lint
-
-# Clean build files
-pnpm clean
-
-# Cloudflare Pages deployment
-pnpm run cf:build
-pnpm run cf:deploy
-
-# Docker deployment
-pnpm run docker:build
-pnpm run docker:dev
-pnpm run docker:prod
+pnpm dev          # Development mode
+pnpm build        # Build project
+pnpm start        # Start production server
+pnpm lint         # Code linting
+pnpm clean        # Clean build files
 ```
 
 ### Project Structure
@@ -388,176 +292,57 @@ NavSphere/
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── api/               # API routes
-│   │   │   ├── videos/        # Video API
-│   │   │   └── navigation/    # Website navigation API
 │   │   ├── admin/             # Admin dashboard
-│   │   │   ├── videos/        # Video management
-│   │   │   └── navigation/    # Website management
-│   │   ├── videos/            # Video pages
 │   │   └── components/        # Page components
 │   ├── components/            # Shared UI components
-│   │   ├── video-card.tsx     # Video card
-│   │   ├── video-content.tsx  # Video content
-│   │   ├── video-player-page.tsx # Video player
-│   │   ├── navigation-card.tsx # Website card
-│   │   └── navigation-content.tsx # Website content
 │   ├── lib/                   # Utility functions
 │   ├── types/                 # TypeScript type definitions
-│   │   ├── navigation.ts      # Navigation types
-│   │   └── video.ts          # Video types
-│   ├── services/              # Service layer
-│   └── navsphere/             # Data files
-│       └── content/
-│           ├── videos.json    # Video data
-│           ├── navigation.json # Website navigation data
-│           └── site.json      # Site configuration
-├── public/                    # Static assets
-│   └── assets/
-│       ├── cover/             # Video cover images
-│       └── images/
-│           └── logos/         # Website icons
-├── docker/                    # Docker configuration
-└── wrangler.toml             # Cloudflare configuration
+│   └── services/              # Service layer
+├── public/assets/             # Static assets
+├── .github/workflows/         # GitHub Actions CI/CD
+└── wrangler.toml              # Cloudflare Workers config
 ```
 
 ## 🎯 Usage Guide
 
-### Video Navigation
+### Adding Videos
 
-#### Adding Videos
+1. Log in to admin at `/admin/videos`
+2. Click "Add Video" and paste a Bilibili or YouTube link
+3. The system auto-detects the platform and extracts video info
+4. Save
 
-1. Log in to admin dashboard at `/admin/videos`
-2. Click "Add Video Category" or "Add Video" in an existing category
-3. Paste the Bilibili or YouTube video link
-4. The system will automatically identify the platform and extract video information
-5. Add title, description, and upload cover (optional)
-6. Save the video
+### Adding Websites
 
-#### Supported Video Links
+1. Log in to admin at `/admin/navigation`
+2. Click "Add Website" and enter the URL
+3. The system auto-fetches title, description, and favicon
+4. Save
+
+### Video Links Supported
 
 **Bilibili:**
-- Standard link: `https://www.bilibili.com/video/BVxxxxxxxxx`
-- Short link: `https://b23.tv/xxxxxxx`
+- `https://www.bilibili.com/video/BVxxxxxxxxx`
+- `https://b23.tv/xxxxxxx`
 
 **YouTube:**
-- Standard link: `https://www.youtube.com/watch?v=xxxxxxxxxxx`
-- Short link: `https://youtu.be/xxxxxxxxxxx`
-
-#### Video Category Management
-
-1. Create main categories and subcategories in the admin dashboard
-2. Use drag and drop to adjust category order
-3. Select appropriate icons for categories (Lucide icons)
-4. Enable/disable category display
-
-### Website Navigation
-
-#### Adding Websites
-
-1. Log in to admin dashboard at `/admin/navigation`
-2. Click "Add Navigation Category" or "Add Website" in an existing category
-3. Enter the website URL
-4. The system will automatically fetch:
-   - Website title
-   - Website description
-   - Website Favicon
-5. Manually edit title and description
-6. Upload custom icon (optional)
-7. Save the website
-
-#### Website Category Management
-
-1. **Create Category**:
-   - Click "Add Navigation Category" in the admin dashboard
-   - Enter category name and description
-   - Select an appropriate icon from Lucide Icons
-   - Save the category
-
-2. **Create Subcategory**:
-   - Add subcategories under main categories
-   - Support unlimited hierarchy of categories
-   - Each subcategory can have its own icon and description
-
-3. **Adjust Order**:
-   - Use drag and drop to adjust the display order of categories and websites
-   - Support cross-category dragging
-
-4. **Batch Management**:
-   - Use Monaco Editor to directly edit JSON data
-   - Support batch import and export
-
-### Common Features
-
-#### Icon Management
-
-**Lucide Icons**:
-- Full Lucide icon library integration
-- Available icons: Home, Star, BookOpen, Brain, Code, etc.
-- Visit [lucide.dev](https://lucide.dev/) to view all available icons
-
-**Custom Icons**:
-- Support upload of PNG, SVG, WebP formats
-- Recommended size: 256x256 pixels
-- Automatic optimization and compression
-
-#### Search Function
-
-1. Use the search box on the homepage
-2. Support searching:
-   - Website/video titles
-   - Description content
-   - Category names
-3. Real-time search results display
+- `https://www.youtube.com/watch?v=xxxxxxxxxxx`
+- `https://youtu.be/xxxxxxxxxxx`
 
 ## 🐛 Troubleshooting
 
-### Common Issues
+**Login fails** — Verify `ADMIN_USERS` format is `user:pass,user2:pass2`
 
-**Authentication Failure**
-- Check if `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` are correct
-- Confirm the callback URL is configured correctly: `http://localhost:3000/api/auth/callback/github`
+**Data not loading** — Check `GITHUB_PAT` has `Contents: Read/Write` on the correct repo
 
-**Data Loading Failure**
-- Verify GitHub repository configuration (GITHUB_OWNER, GITHUB_REPO, GITHUB_BRANCH)
-- Check repository access permissions
-- Confirm data file format is correct
-
-**Video Playback Issues**
-- Check if the video link is valid
-- Confirm videoConfig is configured correctly
-- Bilibili videos require correct bvid, aid, cid
-- YouTube videos require correct video ID
-
-**Build Failure**
-- Check Node.js version (requires 20.0+)
-- Clean dependencies: `rm -rf node_modules pnpm-lock.yaml && pnpm install`
-- Check environment variable configuration
-
-## 🤝 Contributing
-
-We welcome all forms of contribution!
-
-1. Fork the project
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push the branch: `git push origin feature/amazing-feature`
-5. Create a Pull Request
+**Build fails** — Ensure Node.js >= 20, try `rm -rf node_modules pnpm-lock.yaml && pnpm install`
 
 ## 📄 License
 
-This project is open-sourced under the [MIT License](LICENSE).
-
-## 🙏 Acknowledgments
-
-- [Next.js](https://nextjs.org/) - Powerful React framework
-- [Tailwind CSS](https://tailwindcss.com/) - Excellent CSS framework
-- [Radix UI](https://www.radix-ui.com/) - Accessible component library
-- [shadcn/ui](https://ui.shadcn.com/) - Beautiful UI components
-- [Cloudflare Pages](https://pages.cloudflare.com/) - Reliable deployment platform
-- All developers who contributed to the project
+MIT
 
 ---
 
 <p align="center">
-  <strong>⭐ If this project helps you, please give us a Star!</strong>
+  <strong>⭐ Star this project if it helps you!</strong>
 </p>
