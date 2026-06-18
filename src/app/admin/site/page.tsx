@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from "react"
+import { useEffect, useState, type ComponentType } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, useFieldArray } from "react-hook-form"
 import * as z from "zod"
@@ -11,8 +11,28 @@ import { useToast } from "@/registry/new-york/hooks/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/registry/new-york/ui/tabs"
 import { Icons } from "@/components/icons"
 import { Textarea } from "@/registry/new-york/ui/textarea"
-import { Plus, Trash2 } from "lucide-react"
+import {
+  Plus, Trash2, Github, HelpCircle, Puzzle, MonitorPlay, Send, Globe, ExternalLink,
+  Link2, Mail, MessageCircle, BookOpen, Download, Share2,
+  Heart, Star, Bell, Sun, Moon, Zap,
+  Music, Film, Camera, Video,
+  Settings, User, Search, Home, Info,
+  ArrowRight, ChevronRight, Check, ChevronsUpDown
+} from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/registry/new-york/ui/select"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/registry/new-york/ui/command"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/registry/new-york/ui/popover"
 import {
   Form,
   FormControl,
@@ -370,6 +390,88 @@ const ICON_OPTIONS = [
   "ArrowRight", "ChevronRight"
 ]
 
+const iconMap: Record<string, ComponentType<{ className?: string }>> = {
+  Github, Puzzle, HelpCircle, Globe, MonitorPlay, Send, ExternalLink,
+  Link2, Mail, MessageCircle, BookOpen, Download, Share2,
+  Heart, Star, Bell, Sun, Moon, Zap,
+  Music, Film, Camera, Video,
+  Settings, User, Search, Home, Info,
+  ArrowRight, ChevronRight
+}
+
+function IconPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState("")
+  const Icon = iconMap[value]
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+        >
+          {value ? (
+            <span className="flex items-center gap-2">
+              {Icon && <Icon className="h-4 w-4" />}
+              <span>{value}</span>
+            </span>
+          ) : (
+            "选择图标"
+          )}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[300px] p-0">
+        <Command>
+          <CommandInput
+            placeholder="搜索或输入图标名..."
+            value={search}
+            onValueChange={setSearch}
+          />
+          <CommandList>
+            <CommandEmpty>
+              {search && (
+                <CommandItem
+                  value={search}
+                  onSelect={() => {
+                    onChange(search)
+                    setOpen(false)
+                  }}
+                >
+                  <span>使用 "{search}"</span>
+                </CommandItem>
+              )}
+            </CommandEmpty>
+            <CommandGroup>
+              {ICON_OPTIONS.map((name) => {
+                const IconComp = iconMap[name]
+                return (
+                  <CommandItem
+                    key={name}
+                    value={name}
+                    onSelect={(currentValue) => {
+                      onChange(currentValue)
+                      setOpen(false)
+                    }}
+                  >
+                    {IconComp && <IconComp className="mr-2 h-4 w-4 shrink-0" />}
+                    <span>{name}</span>
+                    {value === name && <Check className="ml-auto h-4 w-4" />}
+                  </CommandItem>
+                )
+              })}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 function HeaderLinksField({ control }: { control: any }) {
   const { fields, append, remove } = useFieldArray({ control, name: "headerLinks" })
 
@@ -388,13 +490,8 @@ function HeaderLinksField({ control }: { control: any }) {
                 <FormItem>
                   <FormLabel>图标</FormLabel>
                   <FormControl>
-                    <Input placeholder="Github" list="icon-suggestions" {...field} />
+                    <IconPicker value={field.value} onChange={field.onChange} />
                   </FormControl>
-                  <datalist id="icon-suggestions">
-                    {ICON_OPTIONS.map(name => (
-                      <option key={name} value={name} />
-                    ))}
-                  </datalist>
                   <FormMessage />
                 </FormItem>
               )}
