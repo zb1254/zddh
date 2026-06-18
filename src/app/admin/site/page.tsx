@@ -387,18 +387,14 @@ function HeaderLinksField({ control }: { control: any }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>图标</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="选择图标" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {ICON_OPTIONS.map(name => (
-                        <SelectItem key={name} value={name}>{name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input placeholder="Github" list="icon-suggestions" {...field} />
+                  </FormControl>
+                  <datalist id="icon-suggestions">
+                    {ICON_OPTIONS.map(name => (
+                      <option key={name} value={name} />
+                    ))}
+                  </datalist>
                   <FormMessage />
                 </FormItem>
               )}
