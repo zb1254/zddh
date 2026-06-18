@@ -21,22 +21,9 @@ const nextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/auth/:path*',
-        destination: '/api/auth/:path*'
-      },
-      {
-        source: '/auth/:path*',
-        destination: '/auth/:path*'
-      }
-    ]
-  },
-  // Cloudflare Pages configuration
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost', '*.pages.dev', 'newkit.site']
+      allowedOrigins: ['localhost', '*.pages.dev', 'newkit.site', 'dh.imba.mba']
     },
     optimizePackageImports: ['lucide-react', 'date-fns', 'lodash']
   }
