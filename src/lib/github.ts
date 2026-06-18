@@ -8,7 +8,7 @@ export async function getFileContent(path: string) {
 
   try {
     const session = await auth()
-    const token = session?.user?.accessToken
+    const token = session?.user?.accessToken || process.env.GITHUB_PAT
 
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`
     const response = await fetch(apiUrl, {
