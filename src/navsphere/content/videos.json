@@ -48,7 +48,8 @@
               "enabled": true,
               "videoConfig": {
                 "type": "bilibili",
-                "bvid": "BV1Ha4y1i7zJ"
+                "bvid": "BV1Ha4y1i7zJ",
+                "p": 2
               }
             }
           ]
