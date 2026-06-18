@@ -18,6 +18,18 @@
             "type": "url",
             "url": "https://bfikuncdn.com/20260521/gC1wAOzz/index.m3u8"
           }
+        },
+        {
+          "id": "1781785848348",
+          "title": "给阿嬷的情书 TC版",
+          "href": "https://bfikuncdn.com/20260509/wdYZbLu9/index.m3u8",
+          "description": "",
+          "icon": "https://ynztctv.com/upload/vod/20260509-1/f63ff4b425920c37a360deddd4e9ebc1.webp",
+          "enabled": true,
+          "videoConfig": {
+            "type": "url",
+            "url": "https://bfikuncdn.com/20260509/wdYZbLu9/index.m3u8"
+          }
         }
       ],
       "subCategories": []
