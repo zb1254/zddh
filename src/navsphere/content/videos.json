@@ -15,7 +15,19 @@
       "icon": "PlayCircle",
       "description": "",
       "enabled": true,
-      "items": [],
+      "items": [
+        {
+          "id": "1781763169946",
+          "title": "行为经济学 1.1 行为经济学简介",
+          "href": "https://www.bilibili.com/video/BV1Ha4y1i7zJ?spm_id_from=333.788.videopod.episodes",
+          "description": "访问 www.bilibili.com",
+          "icon": "https://www.google.com/s2/favicons?sz=128&domain=www.bilibili.com",
+          "enabled": true,
+          "videoConfig": {
+            "type": "bilibili"
+          }
+        }
+      ],
       "subCategories": [
         {
           "id": "61ed43d7-78f6-4eaa-881b-973c16a77f91",
