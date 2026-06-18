@@ -15,23 +15,7 @@
       "icon": "PlayCircle",
       "description": "",
       "enabled": true,
-      "items": [
-        {
-          "id": "1781763169946",
-          "title": "【10堂速成课】读懂行为经济学 27讲 - 行为经济学",
-          "href": "https://www.bilibili.com/video/BV1es411q7Xb",
-          "description": "Bilibili - 行为经济学入门课程",
-          "icon": "",
-          "enabled": true,
-          "videoConfig": {
-            "type": "bilibili",
-            "bvid": "BV1es411q7Xb",
-            "aid": "4485557",
-            "cid": "7269930",
-            "p": 1
-          }
-        }
-      ],
+      "items": [],
       "subCategories": [
         {
           "id": "d9c1965a-df06-4242-a7c3-d17c78818585",
