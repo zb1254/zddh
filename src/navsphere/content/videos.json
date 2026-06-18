@@ -51,6 +51,19 @@
                 "bvid": "BV1Ha4y1i7zJ",
                 "p": 2
               }
+            },
+            {
+              "id": "1781771632264",
+              "title": "bilibili",
+              "href": "https://www.bilibili.com/video/BV1Ha4y1i7zJ?spm_id_from=333.788.videopod.episodes&p=3",
+              "description": "访问 www.bilibili.com",
+              "icon": "/assets/icons/bilibili.svg",
+              "enabled": true,
+              "videoConfig": {
+                "type": "bilibili",
+                "bvid": "BV1Ha4y1i7zJ",
+                "p": 3
+              }
             }
           ]
         }
