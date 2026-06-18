@@ -3,7 +3,8 @@
 import { signIn } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from "@/components/ui/button"
-import { Icons } from "@/components/icons"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { useState, Suspense } from 'react'
 import {
   Card,
@@ -18,18 +19,27 @@ function SignInContent() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams?.get('callbackUrl') || '/admin'
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [form, setForm] = useState({ username: '', password: '' })
 
-  const handleSignIn = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
     try {
       setIsLoading(true)
-      await signIn('github', {
+      setError('')
+      const result = await signIn('credentials', {
+        username: form.username,
+        password: form.password,
         callbackUrl,
         redirect: true,
-        scope: 'repo'
       })
-    } catch (error) {
+      if (result?.error) {
+        setError('用户名或密码错误')
+        setIsLoading(false)
+      }
+    } catch {
+      setError('登录失败，请重试')
       setIsLoading(false)
-      console.error('登录失败:', error)
     }
   }
 
@@ -70,27 +80,42 @@ function SignInContent() {
                 登录管理后台
               </CardTitle>
               <CardDescription className="text-center">
-                使用 GitHub 账号登录以访问管理功能
+                输入管理员账号密码登录
               </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4">
-              <Button
-                onClick={handleSignIn}
-                className="w-full bg-[#24292F] hover:bg-[#24292F]/90 text-white"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                    登录中...
-                  </>
-                ) : (
-                  <>
-                    <Icons.github className="mr-2 h-4 w-4" />
-                    GitHub 账号登录
-                  </>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="grid gap-4">
+                {error && (
+                  <div className="text-sm text-red-500 text-center">{error}</div>
                 )}
-              </Button>
+                <div className="grid gap-2">
+                  <Label htmlFor="username">用户名</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="请输入用户名"
+                    value={form.username}
+                    onChange={e => setForm({ ...form, username: e.target.value })}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="password">密码</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="请输入密码"
+                    value={form.password}
+                    onChange={e => setForm({ ...form, password: e.target.value })}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? '登录中...' : '登录'}
+                </Button>
+              </form>
             </CardContent>
             <CardFooter className="flex flex-wrap items-center justify-center gap-2">
               <div className="text-sm text-muted-foreground">
@@ -123,4 +148,4 @@ export default function SignInPage() {
       <SignInContent />
     </Suspense>
   )
-} 
+}
