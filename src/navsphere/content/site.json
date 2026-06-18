@@ -30,11 +30,11 @@
     }
   ],
   "popup": {
-    "enabled": false,
-    "title": "",
-    "content": "",
+    "enabled": true,
+    "title": "欢迎你亲爱的",
+    "content": "欢迎你来到咱们的网站！",
     "imageUrl": "",
-    "linkUrl": "",
-    "linkText": ""
+    "linkUrl": "https://dh.imba.mba/assets/images/alogo.webp",
+    "linkText": "网站"
   }
 }
