@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, type ComponentType } from 'react'
 import type { NavigationData, NavigationItem, NavigationSubItem } from '@/types/navigation'
 import type { SiteConfig } from '@/types/site'
 import { NavigationCard } from '@/components/navigation-card'
@@ -8,14 +8,19 @@ import { Sidebar } from '@/components/sidebar'
 import { SearchBar } from '@/components/search-bar'
 import { ModeToggle } from '@/components/mode-toggle'
 import { Footer } from '@/components/footer'
-import { Github, HelpCircle, Puzzle, MonitorPlay, Send, Globe, ExternalLink } from 'lucide-react'
+import { Github, HelpCircle, Puzzle, MonitorPlay, Send, Globe, ExternalLink, Link2, Mail, MessageCircle, BookOpen, Download, Share2, Heart, Star, Bell, Sun, Moon, Zap, Music, Film, Camera, Video, Settings, User, Search, Home, Info, ArrowRight, ChevronRight } from 'lucide-react'
 import { Button } from "@/registry/new-york/ui/button"
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Menu } from 'lucide-react'
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Github, Puzzle, HelpCircle, Globe, MonitorPlay, Send, ExternalLink
+const iconMap: Record<string, ComponentType<{ className?: string }>> = {
+  Github, Puzzle, HelpCircle, Globe, MonitorPlay, Send, ExternalLink,
+  Link2, Mail, MessageCircle, BookOpen, Download, Share2,
+  Heart, Star, Bell, Sun, Moon, Zap,
+  Music, Film, Camera, Video,
+  Settings, User, Search, Home, Info,
+  ArrowRight, ChevronRight
 }
 
 interface NavigationContentProps {

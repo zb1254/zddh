@@ -361,13 +361,22 @@ export default function SiteSettings() {
   )
 }
 
+const ICON_OPTIONS = [
+  "Github", "Puzzle", "HelpCircle", "Globe", "MonitorPlay", "Send", "ExternalLink",
+  "Link2", "Mail", "MessageCircle", "BookOpen", "Download", "Share2",
+  "Heart", "Star", "Bell", "Sun", "Moon", "Zap",
+  "Music", "Film", "Camera", "Video",
+  "Settings", "User", "Search", "Home", "Info",
+  "ArrowRight", "ChevronRight"
+]
+
 function HeaderLinksField({ control }: { control: any }) {
   const { fields, append, remove } = useFieldArray({ control, name: "headerLinks" })
 
   return (
     <div className="space-y-4">
       <FormDescription>
-        配置顶部导航栏右侧的图标链接。图标名称支持：Github, Puzzle, HelpCircle, Globe, MonitorPlay, Send, ExternalLink 等 Lucide 图标名。
+        配置顶部导航栏右侧的图标链接。
       </FormDescription>
       {fields.map((field, index) => (
         <div key={field.id} className="flex items-start gap-2 p-3 border rounded-lg">
@@ -378,9 +387,18 @@ function HeaderLinksField({ control }: { control: any }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>图标</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Github" {...field} />
-                  </FormControl>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="选择图标" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {ICON_OPTIONS.map(name => (
+                        <SelectItem key={name} value={name}>{name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
