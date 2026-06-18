@@ -77,13 +77,17 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
     const [isFetchingMetadata, setIsFetchingMetadata] = useState(false)
 
     // 从 URL 中提取视频 ID（客户端兜底）
-    const extractVideoIdFromUrl = (url: string): { type: 'bilibili' | 'youtube'; id: string } | null => {
+    const extractVideoIdFromUrl = (url: string): { type: 'bilibili' | 'youtube'; id: string; p?: number } | null => {
         try {
             const urlObj = new URL(url)
             // Bilibili
             if (urlObj.hostname.includes('bilibili.com') || urlObj.hostname.includes('b23.tv')) {
                 const bvidMatch = urlObj.pathname.match(/\/video\/(BV[a-zA-Z0-9]+)/)
-                if (bvidMatch) return { type: 'bilibili', id: bvidMatch[1] }
+                if (bvidMatch) {
+                    const p = urlObj.searchParams.get('p')
+                    const pNum = p ? parseInt(p) : undefined
+                    return { type: 'bilibili', id: bvidMatch[1], p: pNum && !isNaN(pNum) ? pNum : undefined }
+                }
             }
             // YouTube
             if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
@@ -117,7 +121,7 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
     }
 
     // 浏览器端从 Bilibili API 获取 aid/cid（服务端 API 被海外屏蔽时的兜底）
-    const fetchBilibiliApiInfo = async (bvid: string) => {
+    const fetchBilibiliApiInfo = async (bvid: string, p?: number) => {
         try {
             const res = await fetch(`https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`, {
                 headers: { 'User-Agent': 'Mozilla/5.0' }
@@ -126,12 +130,15 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
             const data = await res.json()
             if (data.code === 0 && data.data) {
                 const d = data.data
-                const cid = d.pages?.[0]?.cid || d.cid
+                const pageIndex = p && p > 0 ? p - 1 : 0
+                const targetPage = d.pages?.[pageIndex]
+                const cid = targetPage?.cid || d.cid
                 if (d.aid) form.setValue('videoConfig.aid', String(d.aid))
                 if (cid) form.setValue('videoConfig.cid', String(cid))
                 if (d.title) form.setValue('title', d.title)
                 if (d.desc) form.setValue('description', d.desc)
                 if (d.pic) form.setValue('icon', d.pic)
+                if (p) form.setValue('videoConfig.p', p)
             }
         } catch { /* silent */ }
     }
@@ -198,7 +205,7 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
                     if (extracted.type === 'bilibili') {
                         form.setValue('videoConfig.bvid', extracted.id)
                         // 浏览器端从 Bilibili API 获取 aid/cid
-                        fetchBilibiliApiInfo(extracted.id)
+                        fetchBilibiliApiInfo(extracted.id, extracted.p)
                     } else if (extracted.type === 'youtube') {
                         form.setValue('videoConfig.videoId', extracted.id)
                     }
@@ -219,7 +226,7 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
                     form.setValue('videoConfig.type', extracted.type)
                     if (extracted.type === 'bilibili') {
                         form.setValue('videoConfig.bvid', extracted.id)
-                        fetchBilibiliApiInfo(extracted.id)
+                        fetchBilibiliApiInfo(extracted.id, extracted.p)
                     } else if (extracted.type === 'youtube') {
                         form.setValue('videoConfig.videoId', extracted.id)
                     }

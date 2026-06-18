@@ -101,24 +101,25 @@ function isValidUrl(string: string): boolean {
     }
 }
 
-// 从 Bilibili 链接中提取 BV 或 AV 号
-function extractBilibiliVideoId(url: string): { bvid?: string; aid?: string } | null {
+// 从 Bilibili 链接中提取 BV 或 AV 号及分P
+function extractBilibiliVideoId(url: string): { bvid?: string; aid?: string; p?: number } | null {
     try {
         const urlObj = new URL(url)
         if (!urlObj.hostname.includes('bilibili.com')) {
             return null
         }
 
-        // 匹配 BV 号: /video/BVxxxxxxx 或 /video/BV1xxxxx
+        const p = urlObj.searchParams.get('p')
+        const pNum = p ? parseInt(p) : undefined
+
         const bvidMatch = urlObj.pathname.match(/\/video\/(BV[a-zA-Z0-9]+)/)
         if (bvidMatch) {
-            return { bvid: bvidMatch[1] }
+            return { bvid: bvidMatch[1], p: pNum && !isNaN(pNum) ? pNum : undefined }
         }
 
-        // 匹配 AV 号: /video/avxxxxxxx
         const avidMatch = urlObj.pathname.match(/\/video\/av(\d+)/)
         if (avidMatch) {
-            return { aid: avidMatch[1] }
+            return { aid: avidMatch[1], p: pNum && !isNaN(pNum) ? pNum : undefined }
         }
 
         return null
@@ -128,7 +129,7 @@ function extractBilibiliVideoId(url: string): { bvid?: string; aid?: string } | 
 }
 
 // 通过 Bilibili API 获取视频信息
-async function fetchBilibiliVideoInfo(videoId: { bvid?: string; aid?: string }): Promise<WebsiteMetadata | null> {
+async function fetchBilibiliVideoInfo(videoId: { bvid?: string; aid?: string; p?: number }): Promise<WebsiteMetadata | null> {
     try {
         let apiUrl: string
         if (videoId.bvid) {
@@ -161,21 +162,22 @@ async function fetchBilibiliVideoInfo(videoId: { bvid?: string; aid?: string }):
 
         const videoData = data.data
 
-        // 获取第一个分P的cid
-        const firstPage = videoData.pages?.[0]
-        const cid = firstPage?.cid?.toString() || videoData.cid?.toString()
+        // 根据分P获取对应cid
+        const pageIndex = videoId.p && videoId.p > 0 ? videoId.p - 1 : 0
+        const targetPage = videoData.pages?.[pageIndex]
+        const cid = targetPage?.cid?.toString() || videoData.cid?.toString()
 
         return {
             title: videoData.title || '',
             description: videoData.desc || '',
-            icon: '/assets/icons/bilibili.svg', // 使用本地 Bilibili 图标
-            image: videoData.pic || undefined, // Bilibili 视频封面
+            icon: '/assets/icons/bilibili.svg',
+            image: videoData.pic || undefined,
             videoConfig: {
                 type: 'bilibili',
                 bvid: videoData.bvid,
                 aid: videoData.aid?.toString(),
                 cid: cid,
-                p: 1
+                p: videoId.p || 1
             }
         }
     } catch (error) {
@@ -203,13 +205,13 @@ async function fetchWebsiteMetadata(url: string): Promise<WebsiteMetadata> {
             if (bilibiliInfo) {
                 return bilibiliInfo
             }
-            // Bilibili API 失败（海外 Worker 被屏蔽等），返回 BVID 兜底
+            // Bilibili API 失败（海外 Worker 被屏蔽），不返回 videoConfig，
+            // 让客户端兜底从浏览器直接请求 api.bilibili.com
             const hostname = new URL(url).hostname
             return {
                 title: hostname.replace(/^www\./, '').split('.')[0],
                 description: `访问 ${hostname}`,
-                icon: `https://www.google.com/s2/favicons?sz=128&domain=${hostname}`,
-                videoConfig: { type: 'bilibili', bvid: bilibiliVideoId.bvid || bilibiliVideoId.aid }
+                icon: `https://www.google.com/s2/favicons?sz=128&domain=${hostname}`
             }
         }
 
