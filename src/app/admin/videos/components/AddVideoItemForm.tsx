@@ -133,9 +133,11 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
                 const pageIndex = p && p > 0 ? p - 1 : 0
                 const targetPage = d.pages?.[pageIndex]
                 const cid = targetPage?.cid || d.cid
+                const episodeTitle = targetPage?.part
                 if (d.aid) form.setValue('videoConfig.aid', String(d.aid))
                 if (cid) form.setValue('videoConfig.cid', String(cid))
-                if (d.title) form.setValue('title', d.title)
+                if (episodeTitle) form.setValue('title', episodeTitle)
+                else if (d.title) form.setValue('title', d.title)
                 if (d.desc) form.setValue('description', d.desc)
                 if (d.pic) form.setValue('icon', d.pic)
                 if (p) form.setValue('videoConfig.p', p)

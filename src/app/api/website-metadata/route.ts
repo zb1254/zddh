@@ -162,13 +162,14 @@ async function fetchBilibiliVideoInfo(videoId: { bvid?: string; aid?: string; p?
 
         const videoData = data.data
 
-        // 根据分P获取对应cid
+        // 根据分P获取对应cid和单集标题
         const pageIndex = videoId.p && videoId.p > 0 ? videoId.p - 1 : 0
         const targetPage = videoData.pages?.[pageIndex]
         const cid = targetPage?.cid?.toString() || videoData.cid?.toString()
+        const episodeTitle = targetPage?.part
 
         return {
-            title: videoData.title || '',
+            title: episodeTitle || videoData.title || '',
             description: videoData.desc || '',
             icon: '/assets/icons/bilibili.svg',
             image: videoData.pic || undefined,
