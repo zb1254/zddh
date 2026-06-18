@@ -22,13 +22,7 @@
           "href": "https://www.bilibili.com/video/BV1es411q7Xb/?spm_id_from=333.337.search-card.all.click",
           "description": "访问 www.bilibili.com",
           "icon": "https://www.google.com/s2/favicons?sz=128&domain=www.bilibili.com",
-          "enabled": true,
-          "videoConfig": {
-            "type": "bilibili",
-            "bvid": "BV1es411q7Xb",
-            "aid": "24039868",
-            "cid": "39688568"
-          }
+          "enabled": true
         }
       ],
       "subCategories": [
