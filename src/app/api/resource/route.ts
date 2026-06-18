@@ -73,6 +73,7 @@ async function uploadImageToGitHub(binaryData: Uint8Array, token: string, folder
         headers: {
             'Authorization': `token ${token}`,
             'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'NavSphere',
         },
         body: JSON.stringify({
             message: `Upload ${githubPath}`,
