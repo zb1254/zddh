@@ -24,12 +24,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { VideoIconUpload } from "./VideoIconUpload"
 
 const videoConfigSchema = z.object({
-    type: z.enum(['bilibili', 'youtube']),
+    type: z.enum(['bilibili', 'youtube', 'url']),
     videoId: z.string().optional(),
     bvid: z.string().optional(),
     aid: z.string().optional(),
     cid: z.string().optional(),
     p: z.preprocess((val) => (val ? Number(val) : undefined), z.number().optional()),
+    url: z.string().optional(),
 })
 
 const formSchema = z.object({
@@ -76,11 +77,17 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
 
     const [isFetchingMetadata, setIsFetchingMetadata] = useState(false)
 
-    // 从 URL 中提取视频 ID（客户端兜底）
-    const extractVideoIdFromUrl = (url: string): { type: 'bilibili' | 'youtube'; id: string; p?: number } | null => {
+    const isMediaUrl = (url: string): boolean => {
+        const mediaExts = ['.mp4', '.webm', '.mov', '.ogg', '.mp3', '.wav', '.flac', '.aac', '.m4a', '.opus', '.m3u8']
+        try {
+            const pathname = new URL(url).pathname.toLowerCase()
+            return mediaExts.some(ext => pathname.endsWith(ext))
+        } catch { return false }
+    }
+
+    const extractVideoIdFromUrl = (url: string): { type: 'bilibili' | 'youtube' | 'url'; id?: string; p?: number } | null => {
         try {
             const urlObj = new URL(url)
-            // Bilibili
             if (urlObj.hostname.includes('bilibili.com') || urlObj.hostname.includes('b23.tv')) {
                 const bvidMatch = urlObj.pathname.match(/\/video\/(BV[a-zA-Z0-9]+)/)
                 if (bvidMatch) {
@@ -89,10 +96,13 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
                     return { type: 'bilibili', id: bvidMatch[1], p: pNum && !isNaN(pNum) ? pNum : undefined }
                 }
             }
-            // YouTube
             if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
                 const videoId = urlObj.searchParams.get('v') || urlObj.pathname.slice(1)
                 if (videoId) return { type: 'youtube', id: videoId }
+            }
+            // 检测直连媒体 URL
+            if (isMediaUrl(url)) {
+                return { type: 'url' }
             }
             return null
         } catch { return null }
@@ -197,19 +207,21 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
                     if (config.p) form.setValue('videoConfig.p', config.p)
                 } else if (config.type === 'youtube') {
                     if (config.videoId) form.setValue('videoConfig.videoId', config.videoId)
+                } else if (config.type === 'url') {
+                    if (config.url) form.setValue('videoConfig.url', config.url)
                 }
             } else {
-                // 服务端没返回嵌入配置（API 被屏蔽等），用客户端兜底
                 const extracted = extractVideoIdFromUrl(url)
                 if (extracted) {
                     form.setValue('useVideoConfig', true)
                     form.setValue('videoConfig.type', extracted.type)
                     if (extracted.type === 'bilibili') {
-                        form.setValue('videoConfig.bvid', extracted.id)
-                        // 浏览器端从 Bilibili API 获取 aid/cid
-                        fetchBilibiliApiInfo(extracted.id, extracted.p)
+                        form.setValue('videoConfig.bvid', extracted.id || '')
+                        fetchBilibiliApiInfo(extracted.id || '', extracted.p)
                     } else if (extracted.type === 'youtube') {
-                        form.setValue('videoConfig.videoId', extracted.id)
+                        form.setValue('videoConfig.videoId', extracted.id || '')
+                    } else if (extracted.type === 'url') {
+                        form.setValue('videoConfig.url', url)
                     }
                 }
             }
@@ -220,17 +232,18 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
             })
         } catch (error) {
             console.error('Failed to fetch website metadata:', error)
-            // 服务端请求失败，尝试客户端兜底
             if (hrefValue) {
                 const extracted = extractVideoIdFromUrl(hrefValue)
                 if (extracted) {
                     form.setValue('useVideoConfig', true)
                     form.setValue('videoConfig.type', extracted.type)
                     if (extracted.type === 'bilibili') {
-                        form.setValue('videoConfig.bvid', extracted.id)
-                        fetchBilibiliApiInfo(extracted.id, extracted.p)
+                        form.setValue('videoConfig.bvid', extracted.id || '')
+                        fetchBilibiliApiInfo(extracted.id || '', extracted.p)
                     } else if (extracted.type === 'youtube') {
-                        form.setValue('videoConfig.videoId', extracted.id)
+                        form.setValue('videoConfig.videoId', extracted.id || '')
+                    } else if (extracted.type === 'url') {
+                        form.setValue('videoConfig.url', hrefValue)
                     }
                 }
             }
@@ -393,6 +406,7 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
                                         <SelectContent>
                                             <SelectItem value="bilibili">Bilibili</SelectItem>
                                             <SelectItem value="youtube">YouTube</SelectItem>
+                                            <SelectItem value="url">直连</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -467,6 +481,25 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
                                         <FormControl>
                                             <Input placeholder="YouTube Video ID" {...field} />
                                         </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        )}
+
+                        {videoType === 'url' && (
+                            <FormField
+                                control={form.control}
+                                name="videoConfig.url"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>视频/音频直链</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="https://example.com/video.mp4" {...field} />
+                                        </FormControl>
+                                        <FormDescription>
+                                            支持 .mp4 .webm .mp3 .wav .m3u8 等格式
+                                        </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}

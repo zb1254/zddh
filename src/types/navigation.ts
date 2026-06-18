@@ -6,6 +6,7 @@ export interface VideoConfigRaw {
   aid?: string
   cid?: string
   p?: number
+  url?: string
 }
 
 export interface NavigationSubItemRaw {
@@ -30,12 +31,13 @@ export interface NavigationSubItem {
 }
 
 export interface VideoConfig {
-  type: 'bilibili' | 'youtube'
+  type: 'bilibili' | 'youtube' | 'url'
   videoId?: string // simplified ID for youtube or bvid for bilibili
   bvid?: string
   aid?: string
   cid?: string
   p?: number
+  url?: string
 }
 
 export interface NavigationCategoryRaw {

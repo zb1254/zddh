@@ -9,6 +9,7 @@ import { Button } from "@/registry/new-york/ui/button"
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { ScrollArea } from '@/registry/new-york/ui/scroll-area'
+import { VideoPlayer } from '@/components/VideoPlayer'
 
 interface VideoPlayerPageProps {
     navigationData: NavigationData
@@ -85,49 +86,15 @@ export function VideoPlayerPage({ navigationData }: VideoPlayerPageProps) {
             )
         }
 
-        const { videoConfig } = selectedVideo
-
-        if (videoConfig.type === 'bilibili') {
-            const { bvid, aid, cid, p = 1 } = videoConfig
-            const params = new URLSearchParams({ autoplay: '1' })
-            if (bvid) params.set('bvid', bvid)
-            if (aid) params.set('aid', aid)
-            if (cid) params.set('cid', cid)
-            if (p) params.set('p', String(p))
-            const src = `//player.bilibili.com/player.html?${params.toString()}`
-
-            return (
-                <div className="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl">
-                    <iframe
-                        key={selectedVideo.id}
-                        src={src}
-                        scrolling="no"
-                        frameBorder="0"
-                        allowFullScreen={true}
-                        className="w-full h-full border-0"
-                    ></iframe>
-                </div>
-            )
-        }
-
-        if (videoConfig.type === 'youtube') {
-            const { videoId } = videoConfig
-            return (
-                <div className="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl">
-                    <iframe
-                        key={selectedVideo.id}
-                        className="w-full h-full"
-                        src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-                        title={selectedVideo.title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                    ></iframe>
-                </div>
-            )
-        }
-
-        return null
+        return (
+            <div className="w-full bg-black rounded-xl overflow-hidden shadow-2xl">
+                <VideoPlayer
+                    videoConfig={selectedVideo.videoConfig}
+                    title={selectedVideo.title}
+                    className="border-0 rounded-none"
+                />
+            </div>
+        )
     }
 
     const renderVideoItem = (item: NavigationSubItem) => {
@@ -274,11 +241,13 @@ export function VideoPlayerPage({ navigationData }: VideoPlayerPageProps) {
                                     <div className="flex items-center gap-2">
                                         <span className={cn(
                                             "px-2 py-0.5 text-xs font-medium rounded",
-                                            selectedVideo.videoConfig.type === 'bilibili'
-                                                ? "bg-pink-500/10 text-pink-500"
-                                                : "bg-red-500/10 text-red-500"
+                                            selectedVideo.videoConfig.type === 'bilibili' && "bg-pink-500/10 text-pink-500",
+                                            selectedVideo.videoConfig.type === 'youtube' && "bg-red-500/10 text-red-500",
+                                            selectedVideo.videoConfig.type === 'url' && "bg-green-600/10 text-green-600"
                                         )}>
-                                            {selectedVideo.videoConfig.type === 'bilibili' ? 'Bilibili' : 'YouTube'}
+                                            {selectedVideo.videoConfig.type === 'bilibili' && 'Bilibili'}
+                                            {selectedVideo.videoConfig.type === 'youtube' && 'YouTube'}
+                                            {selectedVideo.videoConfig.type === 'url' && '直连'}
                                         </span>
                                         {selectedVideo.href && (
                                             <a

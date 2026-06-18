@@ -6,6 +6,7 @@ import { PlayCircle } from 'lucide-react'
 import type { NavigationSubItem } from '@/types/navigation'
 import type { SiteConfig } from '@/types/site'
 import Image from 'next/image'
+import { VideoPlayer } from '@/components/VideoPlayer'
 
 interface VideoCardProps {
     item: NavigationSubItem
@@ -43,49 +44,9 @@ export function VideoCard({ item }: VideoCardProps) {
 
     const renderVideoContent = () => {
         if (!videoConfig) return null
-
-        if (videoConfig.type === 'bilibili') {
-            const { bvid, aid, cid, p = 1 } = videoConfig
-            const params = new URLSearchParams({ autoplay: '1' })
-            if (bvid) params.set('bvid', bvid)
-            if (aid) params.set('aid', aid)
-            if (cid) params.set('cid', cid)
-            if (p) params.set('p', String(p))
-            const src = `//player.bilibili.com/player.html?${params.toString()}`
-
-            return (
-                <div className="w-full aspect-video">
-                    <iframe
-                        src={src}
-                        scrolling="no"
-                        frameBorder="0"
-                        allowFullScreen={true}
-                        className="w-full h-full rounded-lg border-0"
-                    ></iframe>
-                </div>
-            )
-        }
-
-        if (videoConfig.type === 'youtube') {
-            const { videoId } = videoConfig
-            return (
-                <div className="w-full aspect-video">
-                    <iframe
-                        className="w-full h-full rounded-lg"
-                        src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-                        title={item.title}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                    ></iframe>
-                </div>
-            )
-        }
-
-        return null
+        return <VideoPlayer videoConfig={videoConfig} title={item.title} />
     }
 
-    // 获取平台标识
     const getPlatformBadge = () => {
         if (videoConfig?.type === 'bilibili') {
             return (
@@ -98,6 +59,13 @@ export function VideoCard({ item }: VideoCardProps) {
             return (
                 <span className="absolute top-2 left-2 px-2 py-0.5 text-xs font-medium bg-red-600/90 text-white rounded-md backdrop-blur-sm">
                     YouTube
+                </span>
+            )
+        }
+        if (videoConfig?.type === 'url') {
+            return (
+                <span className="absolute top-2 left-2 px-2 py-0.5 text-xs font-medium bg-green-600/90 text-white rounded-md backdrop-blur-sm">
+                    直连
                 </span>
             )
         }

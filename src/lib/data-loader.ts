@@ -25,9 +25,10 @@ export function processNavigationSubItem(item: NavigationSubItemRaw): Navigation
     let videoConfig: VideoConfig | undefined = undefined
 
     if (item.videoConfig) {
-        const validType = (item.videoConfig.type === 'bilibili' || item.videoConfig.type === 'youtube')
-            ? item.videoConfig.type as 'bilibili' | 'youtube'
-            : 'bilibili' // default fallback
+        const validTypes = ['bilibili', 'youtube', 'url']
+        const validType = validTypes.includes(item.videoConfig.type)
+            ? item.videoConfig.type as 'bilibili' | 'youtube' | 'url'
+            : 'bilibili'
 
         videoConfig = {
             type: validType,
@@ -35,7 +36,8 @@ export function processNavigationSubItem(item: NavigationSubItemRaw): Navigation
             bvid: item.videoConfig.bvid,
             aid: item.videoConfig.aid,
             cid: item.videoConfig.cid,
-            p: item.videoConfig.p
+            p: item.videoConfig.p,
+            url: item.videoConfig.url
         }
     }
 
