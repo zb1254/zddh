@@ -15,18 +15,18 @@
   "headerLinks": [
     {
       "icon": "Github",
-      "href": "https://github.com/tianyaxiang/NavSphere",
+      "href": "https://github.com",
       "ariaLabel": "访问 GitHub 仓库"
     },
     {
       "icon": "Puzzle",
-      "href": "https://github.com/tianyaxiang/navsphere-extension",
-      "ariaLabel": "下载浏览器插件"
+      "href": "https://github.com",
+      "ariaLabel": "访问 GitHub 仓库"
     },
     {
       "icon": "HelpCircle",
-      "href": "https://mp.weixin.qq.com/s/XBeedyqHGJtaAa_v9EXz4A",
-      "ariaLabel": "查看帮助文档"
+      "href": "https://baidu.com",
+      "ariaLabel": "百度一下"
     }
   ]
 }
