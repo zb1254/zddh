@@ -30,9 +30,10 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         run: |
-          mkdir -p .vercel/output/static
-          cp .open-next/worker.js .vercel/output/static/_worker.js
-          npx wrangler pages deploy .vercel/output/static --project-name navsphere
+          mkdir -p deploy-output
+          cp -r .open-next/. deploy-output/
+          mv deploy-output/worker.js deploy-output/_worker.js
+          npx wrangler pages deploy deploy-output --project-name navsphere
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

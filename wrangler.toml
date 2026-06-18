@@ -1,9 +1,4 @@
 name = "navsphere"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".vercel/output/static"
-
-[placeholders]
-# 以下变量将在 Cloudflare Pages Dashboard 中设置
-# GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OWNER, GITHUB_REPO
-# GITHUB_BRANCH, GITHUB_PAT, NEXTAUTH_URL, AUTH_SECRET, NEXT_PUBLIC_API_URL
+pages_build_output_dir = "deploy-output"
