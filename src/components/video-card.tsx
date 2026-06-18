@@ -98,6 +98,7 @@ export function VideoCard({ item }: VideoCardProps) {
                                            group-hover:scale-105 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                                 onLoad={() => setImageLoaded(true)}
                                 onError={() => setImageError(true)}
+                                referrerPolicy="no-referrer"
                             />
                         </>
                     ) : (

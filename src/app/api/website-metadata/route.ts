@@ -128,18 +128,24 @@ function extractBilibiliVideoId(url: string): { bvid?: string; aid?: string; p?:
     }
 }
 
+// 将 Bilibili CDN 图片链接转为 HTTPS（浏览器混合内容限制）
+function normalizeImageUrl(url: string | undefined): string | undefined {
+    if (!url) return undefined
+    return url.replace(/^http:\/\//, 'https://')
+}
+
 // 通过第三方代理 bilibilia.com 获取封面（API 和 HTML 都失败时的兜底）
-async function fetchBilibiliCoverViaProxy(bvid: string): Promise<string | null> {
+async function fetchBilibiliCoverViaProxy(bvid: string): Promise<string | undefined> {
     try {
         const response = await fetch(`https://bilibilia.com/api/bcover/?vid=${bvid}`, {
             headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
             signal: AbortSignal.timeout(5000)
         })
-        if (!response.ok) return null
+        if (!response.ok) return undefined
         const data = await response.json()
-        return data?.coverImageUrl || null
+        return data?.coverImageUrl || undefined
     } catch {
-        return null
+        return undefined
     }
 }
 
@@ -166,7 +172,7 @@ async function scrapeBilibiliPageMeta(bvid: string, p?: number): Promise<Website
 
         // 从 <meta property="og:image"> 提取封面
         const imageMatch = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]*)"[^>]*>/)
-        const image = imageMatch ? imageMatch[1].replace(/^\/\//, 'https://') : undefined
+        const image = imageMatch ? normalizeImageUrl(imageMatch[1].replace(/^\/\//, 'https://')) : undefined
 
         // 从 window.__INITIAL_STATE__ 提取 aid 和 cid
         const initMatch = html.match(/window\.__INITIAL_STATE__\s*=\s*({.*?});\s*</)
@@ -247,7 +253,7 @@ async function fetchBilibiliVideoInfo(videoId: { bvid?: string; aid?: string; p?
             title: episodeTitle || videoData.title || '',
             description: videoData.desc || '',
             icon: '/assets/icons/bilibili.svg',
-            image: videoData.pic || undefined,
+            image: normalizeImageUrl(videoData.pic),
             videoConfig: {
                 type: 'bilibili',
                 bvid: videoData.bvid,
@@ -292,7 +298,7 @@ async function fetchWebsiteMetadata(url: string): Promise<WebsiteMetadata> {
             // 2.5) 尝试第三方代理获取封面
             let coverFromProxy: string | undefined
             if (bilibiliVideoId.bvid) {
-                coverFromProxy = await fetchBilibiliCoverViaProxy(bilibiliVideoId.bvid) || undefined
+                coverFromProxy = normalizeImageUrl(await fetchBilibiliCoverViaProxy(bilibiliVideoId.bvid))
             }
             // 3) 都失败，返回基本信息 + videoConfig 保证嵌入可用
             const hostname = new URL(url).hostname
@@ -413,7 +419,7 @@ function parseMetadataFromHtml(html: string, url: string): WebsiteMetadata {
         title: title.trim(),
         description: description.trim(),
         icon: icon || '',
-        image: image || undefined
+        image: normalizeImageUrl(image || undefined)
     }
 }
 
