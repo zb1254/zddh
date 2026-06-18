@@ -184,6 +184,16 @@ async function fetchBilibiliVideoInfo(videoId: { bvid?: string; aid?: string }):
     }
 }
 
+function extractYouTubeVideoId(url: string): string | null {
+    try {
+        const urlObj = new URL(url)
+        if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
+            return urlObj.searchParams.get('v') || urlObj.pathname.slice(1) || null
+        }
+        return null
+    } catch { return null }
+}
+
 async function fetchWebsiteMetadata(url: string): Promise<WebsiteMetadata> {
     try {
         // 优先处理 Bilibili 视频链接
@@ -193,7 +203,25 @@ async function fetchWebsiteMetadata(url: string): Promise<WebsiteMetadata> {
             if (bilibiliInfo) {
                 return bilibiliInfo
             }
-            // 如果 Bilibili API 失败，继续走通用逻辑
+            // Bilibili API 失败（海外 Worker 被屏蔽等），返回 BVID 兜底
+            const hostname = new URL(url).hostname
+            return {
+                title: hostname.replace(/^www\./, '').split('.')[0],
+                description: `访问 ${hostname}`,
+                icon: `https://www.google.com/s2/favicons?sz=128&domain=${hostname}`,
+                videoConfig: { type: 'bilibili', bvid: bilibiliVideoId.bvid || bilibiliVideoId.aid }
+            }
+        }
+
+        // 处理 YouTube 链接
+        const youtubeVideoId = extractYouTubeVideoId(url)
+        if (youtubeVideoId) {
+            return {
+                title: 'YouTube Video',
+                description: '',
+                icon: `https://www.google.com/s2/favicons?sz=128&domain=youtube.com`,
+                videoConfig: { type: 'youtube', videoId: youtubeVideoId }
+            }
         }
 
         const headers = {

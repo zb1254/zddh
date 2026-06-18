@@ -76,6 +76,24 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
 
     const [isFetchingMetadata, setIsFetchingMetadata] = useState(false)
 
+    // 从 URL 中提取视频 ID（客户端兜底）
+    const extractVideoIdFromUrl = (url: string): { type: 'bilibili' | 'youtube'; id: string } | null => {
+        try {
+            const urlObj = new URL(url)
+            // Bilibili
+            if (urlObj.hostname.includes('bilibili.com') || urlObj.hostname.includes('b23.tv')) {
+                const bvidMatch = urlObj.pathname.match(/\/video\/(BV[a-zA-Z0-9]+)/)
+                if (bvidMatch) return { type: 'bilibili', id: bvidMatch[1] }
+            }
+            // YouTube
+            if (urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be')) {
+                const videoId = urlObj.searchParams.get('v') || urlObj.pathname.slice(1)
+                if (videoId) return { type: 'youtube', id: videoId }
+            }
+            return null
+        } catch { return null }
+    }
+
     // 监听 href 字段变化，自动获取网站信息
     const hrefValue = form.watch("href")
 
@@ -140,7 +158,6 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
             // 自动填充嵌入播放配置
             if (metadata.videoConfig) {
                 const config = metadata.videoConfig
-                // 启用嵌入播放
                 form.setValue('useVideoConfig', true)
                 form.setValue('videoConfig.type', config.type)
 
@@ -152,6 +169,18 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
                 } else if (config.type === 'youtube') {
                     if (config.videoId) form.setValue('videoConfig.videoId', config.videoId)
                 }
+            } else {
+                // 服务端没返回嵌入配置（API 被屏蔽等），用客户端兜底
+                const extracted = extractVideoIdFromUrl(url)
+                if (extracted) {
+                    form.setValue('useVideoConfig', true)
+                    form.setValue('videoConfig.type', extracted.type)
+                    if (extracted.type === 'bilibili') {
+                        form.setValue('videoConfig.bvid', extracted.id)
+                    } else if (extracted.type === 'youtube') {
+                        form.setValue('videoConfig.videoId', extracted.id)
+                    }
+                }
             }
 
             toast({
@@ -160,6 +189,19 @@ export function AddVideoItemForm({ onSubmit, onCancel, defaultValues }: AddVideo
             })
         } catch (error) {
             console.error('Failed to fetch website metadata:', error)
+            // 服务端请求失败，尝试客户端兜底
+            if (hrefValue) {
+                const extracted = extractVideoIdFromUrl(hrefValue)
+                if (extracted) {
+                    form.setValue('useVideoConfig', true)
+                    form.setValue('videoConfig.type', extracted.type)
+                    if (extracted.type === 'bilibili') {
+                        form.setValue('videoConfig.bvid', extracted.id)
+                    } else if (extracted.type === 'youtube') {
+                        form.setValue('videoConfig.videoId', extracted.id)
+                    }
+                }
+            }
             toast({
                 title: "提示",
                 description: "自动获取视频信息失败，请手动填写",
