@@ -44,7 +44,7 @@
               "title": "行为经济学1.2理性与非理性行为",
               "href": "https://www.bilibili.com/video/BV1Ha4y1i7zJ?spm_id_from=333.788.videopod.episodes&p=2",
               "description": "访问 www.bilibili.com",
-              "icon": "https://www.google.com/s2/favicons?sz=128&domain=www.bilibili.com",
+              "icon": "",
               "enabled": true,
               "videoConfig": {
                 "type": "bilibili",
