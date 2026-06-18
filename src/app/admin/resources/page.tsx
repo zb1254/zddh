@@ -302,7 +302,12 @@ export default function ResourceManagement() {
             resolve(xhr.response);
           }
         } else {
-          reject(new Error(`上传失败: ${xhr.statusText}`));
+          try {
+            const errData = JSON.parse(xhr.response);
+            reject(new Error(`上传失败: ${errData.error || xhr.statusText || xhr.status}`));
+          } catch {
+            reject(new Error(`上传失败: ${xhr.statusText || xhr.status}`));
+          }
         }
       };
 

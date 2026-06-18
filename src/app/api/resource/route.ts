@@ -22,21 +22,19 @@ export async function POST(request: Request) {
         const session = await auth();
         const token = session?.user?.accessToken || process.env.GITHUB_PAT;
         if (!token) {
-            return new Response('Unauthorized', { status: 401 });
+            return NextResponse.json({ error: '未授权，请重新登录' }, { status: 401 });
         }
 
-        const { image, folder = 'assets', prefix = 'img' } = await request.json(); // Get the Base64 image, folder and prefix
-        const base64Data = image.split(",")[1]; // Extract the Base64 part
-        const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)); // Convert Base64 to binary
+        const { image, folder = 'assets', prefix = 'img' } = await request.json();
+        const base64Data = image.split(",")[1];
+        const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
 
-        // 获取上传结果，包含路径和 commit hash
         const { path: imageUrl, commitHash } = await uploadImageToGitHub(binaryData, token, folder, prefix);
 
-        // Handle metadata
         const metadata = await getFileContent('src/navsphere/content/resource-metadata.json') as ResourceMetadata;
         metadata.metadata.unshift({
-            commit: commitHash,  // 使用实际的 commit hash
-            hash: commitHash,    // 使用相同的 hash 作为资源标识
+            commit: commitHash,
+            hash: commitHash,
             path: imageUrl
         });
 
@@ -49,11 +47,9 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ success: true, imageUrl });
     } catch (error) {
+        const msg = error instanceof Error ? error.message : '未知错误'
         console.error('Failed to save resource metadata:', error);
-        return NextResponse.json(
-            { error: error instanceof Error ? error.message : 'Failed to save resource metadata' },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: msg }, { status: 500 });
     }
 }
 

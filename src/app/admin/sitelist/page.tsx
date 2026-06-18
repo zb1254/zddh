@@ -957,7 +957,8 @@ export default function SiteListPage() {
       })
 
       if (!response.ok) {
-        throw new Error(`上传失败: ${response.status} ${response.statusText}`)
+        const errData = await response.json().catch(() => ({}))
+        throw new Error(errData.error || `上传失败: ${response.status}`)
       }
 
       const data = await response.json()
