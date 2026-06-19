@@ -281,6 +281,14 @@
               "description": "认识 NotebookLM：给力的 AI 研究工具与思考伙伴，可以帮助您分析来源、理清复杂的资料及转换内容。",
               "icon": "/assets/favicon_1764162265139.svg",
               "enabled": true
+            },
+            {
+              "id": "site_1781844573337_l97712ads",
+              "title": "永久无限免费AI工具 - 无需登录，无需注册 | AIFreeForever",
+              "href": "https://aifreeforever.com/zh",
+              "description": "AI FREE FOREVER是生成免费AI图像和免费与AI聊天的最佳平台。此外，您还可以免费获得700多个AI工具，包括配音、转录和贴纸。立即将我们加入书签以获取任何免费AI工具。",
+              "icon": "https://aifreeforever.com/favicon.ico",
+              "enabled": true
             }
           ]
         },
